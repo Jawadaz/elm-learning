@@ -1,0 +1,18 @@
+# Elm
+elm-stuff/
+
+# Generated files
+index.html
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Other
+nul
+package.json
+package-lock.json
