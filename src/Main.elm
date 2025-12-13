@@ -11,6 +11,7 @@ import Pages.Counter
 import Pages.Github
 import Pages.Home
 import Pages.Todo
+import Pages.D3Chart
 import Route exposing (Route)
 import Url exposing (Url)
 import Json.Decode as Decode
@@ -45,6 +46,7 @@ type alias Model =
     , githubModel : Pages.Github.Model
     , canvasModel : Pages.Canvas.Model
     , todoModel : Pages.Todo.Model
+    , d3ChartModel: Pages.D3Chart.Model
     }
 
 
@@ -65,6 +67,9 @@ init flags url key =
 
         ( todoModel, todoCmd ) =
             Pages.Todo.init
+        
+        ( d3ChartModel, d3ChartCmd ) =
+            Pages.D3Chart.init
     in
     ( { key = key
       , route = route
@@ -72,12 +77,14 @@ init flags url key =
       , githubModel = githubModel
       , canvasModel = canvasModel
       , todoModel = todoModel
+      , d3ChartModel = d3ChartModel
       }
     , Cmd.batch
         [ Cmd.map CounterMsg counterCmd
         , Cmd.map GithubMsg githubCmd
         , Cmd.map CanvasMsg canvasCmd
         , Cmd.map TodoMsg todoCmd
+        , Cmd.map D3ChartMsg d3ChartCmd
         ]
     )
 
@@ -94,6 +101,7 @@ type Msg
     | CanvasMsg Pages.Canvas.Msg
     | TodoMsg Pages.Todo.Msg
     | LoadTodos Json.Encode.Value
+    | D3ChartMsg Pages.D3Chart.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -151,6 +159,16 @@ update msg model =
                 ]
             )
         
+        D3ChartMsg d3ChartMsg ->
+            let
+                ( newD3ChartModel, d3ChartCmd ) =
+                    Pages.D3Chart.update d3ChartMsg model.d3ChartModel
+            in
+            ( { model | d3ChartModel = newD3ChartModel }
+            ,
+                Cmd.map D3ChartMsg d3ChartCmd
+            )
+        
         LoadTodos json ->
             case Decode.decodeValue decodeTodos json of
                 Ok todos ->
@@ -204,6 +222,7 @@ viewHeader =
             , a [ href "/github", style "color" "white", style "margin-right" "20px" ] [ text "GitHub" ]
             , a [ href "/canvas", style "color" "white", style "margin-right" "20px" ] [ text "Canvas" ]
             , a [ href "/todo", style "color" "white", style "margin-right" "20px" ] [ text "Todo" ]
+            , a [ href "/d3chart", style "color" "white", style "margin-right" "20px" ] [ text "D3 Chart" ]
             ]
         ]
 
@@ -229,6 +248,9 @@ viewPage model =
 
         Just Route.Todo ->
             Html.map TodoMsg (Pages.Todo.view model.todoModel)
+        
+        Just Route.D3Chart ->
+            Html.map D3ChartMsg (Pages.D3Chart.view model.d3ChartModel)
 
 
 port saveTodos : Json.Encode.Value -> Cmd msg

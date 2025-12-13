@@ -24,6 +24,20 @@ An interactive Elm learning project built to explore functional programming conc
 - Keyboard controls (Arrow keys to move the ball)
 - Real-time subscriptions
 
+### ✅ Todo List Application
+- Add, edit, and delete todos
+- Inline editing (double-click, Enter/Escape keys)
+- Filter by All/Active/Completed
+- Clear completed todos
+- Active todo counter
+- LocalStorage persistence via JavaScript Ports
+
+### 📊 D3 Chart (In Progress)
+- Dynamic data point management
+- Add/remove data points with labels and values
+- Data preparation for D3.js visualization
+- Port-based JavaScript interop (coming soon)
+
 ## Tech Stack
 
 - **Elm 0.19.1** - Functional programming language for web apps
@@ -45,15 +59,19 @@ Multi-page SPA with URL routing.
 
 ## Running Locally
 
+### Option 1: Using elm reactor (for basic pages)
 ```bash
-# Install Elm (if not already installed)
-npm install -g elm
-
-# Run development server
 elm reactor
-
-# Open browser to http://localhost:8000/index.html
+# Navigate to http://localhost:8000/src/Main.elm
 ```
+
+### Option 2: Compile + Open HTML (required for ports/localStorage)
+```bash
+elm make src/Main.elm --output=elm.js
+# Then open index.html in your browser
+```
+
+**Note**: Use Option 2 if you want to test the Todo page's localStorage persistence.
 
 ## What I Learned
 
@@ -64,8 +82,11 @@ elm reactor
 - ✅ Records and type aliases
 - ✅ Commands for side effects
 - ✅ Subscriptions for continuous events
-- ✅ JSON decoders for type-safe parsing
-- ✅ HTTP requests
+- ✅ JSON encoding/decoding for type-safe data transfer
+- ✅ HTTP requests with RemoteData pattern
 - ✅ SVG rendering
-- ✅ Multi-page routing
-- ✅ Module organization
+- ✅ Multi-page routing with Browser.application
+- ✅ Module organization and exposing
+- ✅ JavaScript Ports for interop (outgoing/incoming)
+- ✅ LocalStorage integration via ports
+- ✅ Custom event decoders (keyboard events)

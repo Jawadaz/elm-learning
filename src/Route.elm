@@ -14,6 +14,7 @@ type Route
     | Github
     | Canvas
     | Todo
+    | D3Chart
 
 
 
@@ -28,6 +29,7 @@ parser =
         , Parser.map Github (s "github")
         , Parser.map Canvas (s "canvas")
         , Parser.map Todo (s "todo")
+        , Parser.map D3Chart (s "d3chart")
         ]
 
 
