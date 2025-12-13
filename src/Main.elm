@@ -1,9 +1,11 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Browser.Navigation as Nav
 import Html exposing (Html, a, div, text)
 import Html.Attributes exposing (href, style)
+import Json.Decode as Decode
+import Json.Encode
 import Pages.Canvas
 import Pages.Counter
 import Pages.Github
@@ -11,6 +13,9 @@ import Pages.Home
 import Pages.Todo
 import Route exposing (Route)
 import Url exposing (Url)
+import Json.Decode as Decode
+import Pages.Todo as Todo
+import Platform.Cmd as Cmd
 
 
 
@@ -88,6 +93,7 @@ type Msg
     | GithubMsg Pages.Github.Msg
     | CanvasMsg Pages.Canvas.Msg
     | TodoMsg Pages.Todo.Msg
+    | LoadTodos Json.Encode.Value
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -139,8 +145,23 @@ update msg model =
                     Pages.Todo.update todoMsg model.todoModel
             in
             ( { model | todoModel = newTodoModel }
-            , Cmd.map TodoMsg todoCmd
+            , Cmd.batch
+                [ Cmd.map TodoMsg todoCmd
+                , saveTodos (Pages.Todo.encodeState newTodoModel) -- NEW!
+                ]
             )
+        
+        LoadTodos json ->
+            case Decode.decodeValue decodeTodos json of
+                Ok todos ->
+                    let
+                        (initialModel, _) = Todo.init
+                        loadedModel = Pages.Todo.setTodos todos initialModel
+                    in
+                    ( { model | todoModel = loadedModel }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
 
 
@@ -149,7 +170,10 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.map CanvasMsg (Pages.Canvas.subscriptions model.canvasModel)
+    Sub.batch
+        [ Sub.map CanvasMsg (Pages.Canvas.subscriptions model.canvasModel)
+        , loadTodos LoadTodos
+        ]
 
 
 
@@ -205,3 +229,30 @@ viewPage model =
 
         Just Route.Todo ->
             Html.map TodoMsg (Pages.Todo.view model.todoModel)
+
+
+port saveTodos : Json.Encode.Value -> Cmd msg
+
+
+port loadTodos : (Json.Encode.Value -> msg) -> Sub msg
+
+
+
+-- Decode a single Todo from JSON
+
+
+decodeTodo : Decode.Decoder Pages.Todo.Todo
+decodeTodo =
+    Decode.map3 Pages.Todo.createTodo
+        (Decode.field "id" Decode.int)
+        (Decode.field "text" Decode.string)
+        (Decode.field "complete" Decode.bool)
+
+
+
+-- Decode a list of Todos
+
+
+decodeTodos : Decode.Decoder (List Pages.Todo.Todo)
+decodeTodos =
+    Decode.list decodeTodo

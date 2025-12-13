@@ -1,9 +1,10 @@
-module Pages.Todo exposing (Model, Msg, init, update, view)
+module Pages.Todo exposing (Model, Msg, createTodo, encodeState, init, update, view, setTodos, Todo)
 
 import Html exposing (Html, br, button, div, input, text)
 import Html.Attributes exposing (checked, disabled, placeholder, style, type_, value)
 import Html.Events exposing (on, onClick, onDoubleClick, onInput)
 import Json.Decode as Decode
+import Json.Encode as Encode
 
 
 type alias Todo =
@@ -280,3 +281,41 @@ countActive todos =
     todos
         |> List.filter (\todo -> not todo.complete)
         |> List.length
+
+
+encodeState : Model -> Encode.Value
+encodeState model =
+    Encode.object
+        [ ( "nextId", Encode.int model.nextId )
+        , ( "Todos", encodeTodos model.todosList )
+        ]
+
+
+encodeTodos : List Todo -> Encode.Value
+encodeTodos todos =
+    Encode.list encodeTodo todos
+
+
+encodeTodo : Todo -> Encode.Value
+encodeTodo todo =
+    Encode.object
+        [ ( "id", Encode.int todo.id )
+        , ( "text", Encode.string todo.text )
+        , ( "complete", Encode.bool todo.complete )
+        ]
+
+
+createTodo : Int -> String -> Bool -> Todo
+createTodo id text complete =
+    { id = id, text = text, complete = complete }
+
+
+setTodos : List Todo -> Model -> Model
+setTodos todos model =
+    let
+        maxId = List.maximum (List.map .id todos) |> Maybe.withDefault 0
+    in
+    { model
+    | todosList = todos
+    , nextId = maxId + 1  -- Set nextId to be one more than highest existing ID
+    }
