@@ -118,11 +118,7 @@ subscriptions _ =
         , Browser.Events.onKeyDown keyDecoder
         ]
 
-
-
--- Decode which key was pressed
-
-
+-- Decode which key was pressed 
 keyDecoder : Decode.Decoder Msg
 keyDecoder =
     Decode.map KeyPressed (Decode.field "key" Decode.string)

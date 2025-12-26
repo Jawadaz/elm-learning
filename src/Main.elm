@@ -190,6 +190,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ Sub.map CanvasMsg (Pages.Canvas.subscriptions model.canvasModel)
+        , Sub.map D3ChartMsg (Pages.D3Chart.subscriptions model.d3ChartModel)
         , loadTodos LoadTodos
         ]
 

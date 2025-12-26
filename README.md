@@ -32,20 +32,24 @@ An interactive Elm learning project built to explore functional programming conc
 - Active todo counter
 - LocalStorage persistence via JavaScript Ports
 
-### 📊 D3 Chart (In Progress)
-- Dynamic data point management
-- Add/remove data points with labels and values
-- Data preparation for D3.js visualization
-- Port-based JavaScript interop (coming soon)
+### 📊 D3 Chart
+- Dynamic data point management (add/remove with labels and values)
+- Interactive bar chart rendered with D3.js
+- Bidirectional port communication (Elm ↔ JavaScript)
+- Click bars to select them (incoming port from JS to Elm)
+- Auto-updates chart when data changes (outgoing port from Elm to JS)
+- Hover effects and axis labels
 
 ## Tech Stack
 
 - **Elm 0.19.1** - Functional programming language for web apps
 - **elm/http** - HTTP requests
-- **elm/json** - JSON decoding
+- **elm/json** - JSON encoding/decoding
 - **elm/time** - Time-based subscriptions
 - **elm/random** - Random number generation
 - **elm/browser** - Browser events and routing
+- **D3.js v7** - Data visualization library
+- **JavaScript Ports** - Elm-JavaScript interop
 
 ## Architecture
 
@@ -88,5 +92,7 @@ elm make src/Main.elm --output=elm.js
 - ✅ Multi-page routing with Browser.application
 - ✅ Module organization and exposing
 - ✅ JavaScript Ports for interop (outgoing/incoming)
+- ✅ Bidirectional port communication (Elm ↔ JavaScript)
 - ✅ LocalStorage integration via ports
+- ✅ D3.js integration for data visualization
 - ✅ Custom event decoders (keyboard events)

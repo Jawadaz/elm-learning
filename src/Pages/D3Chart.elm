@@ -1,4 +1,4 @@
-module Pages.D3Chart exposing (Model, Msg, init, subscriptions, update, view)
+port module Pages.D3Chart exposing (Model, Msg, init, subscriptions, update, view, updateChart, barClicked)
 
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (placeholder, type_, value)
@@ -46,13 +46,21 @@ update msg model =
             let 
                 newDataPoint : DataPoint
                 newDataPoint = ({label = model.currentLabel, value = String.toInt model.currentValue |> Maybe.withDefault 0})
+                newDataPoints : List DataPoint
+                newDataPoints = newDataPoint :: model.dataPoints
             in
-                ({model | dataPoints = newDataPoint :: model.dataPoints}, Cmd.none)
+                ({model | dataPoints = newDataPoints, currentLabel = "", currentValue = ""}
+                , updateChart newDataPoints)
         RemoveDataPoint label ->
-            ({model|dataPoints = model.dataPoints |> 
+            let 
+                newDataPoints : List DataPoint
+                newDataPoints = model.dataPoints |> 
                         List.filter 
                             (\a->
-                                a.label /= label) }, Cmd.none)
+                                a.label /= label)
+            in 
+                ({model|dataPoints =  newDataPoints }
+                    , updateChart newDataPoints)
         BarClicked label ->
             ({model | clickedBar = Just label}, Cmd.none)
 
@@ -76,6 +84,7 @@ view model =
         , div [] (List.map dataPointToHtml model.dataPoints)
         , div []
             [text ("Last Clicked " ++ (model.clickedBar |> Maybe.withDefault ""))]
+        , div [ Html.Attributes.id "d3-chart" ] []
         ]
 
 dataPointToHtml : DataPoint -> Html Msg
@@ -89,5 +98,8 @@ dataPointToHtml dataPoint =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-      -- TODO: We'll add the incoming port subscription later
-      Sub.none
+    barClicked BarClicked
+
+port updateChart : List DataPoint -> Cmd msg
+
+port barClicked : (String -> msg) -> Sub msg
